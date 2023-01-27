@@ -30,7 +30,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='AES cipher utilities by Tech~.',
           prog='aesutil.py')
 
-    subparser = parser.add_subparsers(help='commands',dest='command')
+    subparser = parser.add_subparsers(help='commands', dest='command')
 
     # Generate a random key
     parser_genkey = subparser.add_parser('genkey', help='Generate a random AES key.')
