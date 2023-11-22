@@ -1,2 +1,5 @@
 pycryptodome
 pyperclip
+colorama
+yapf
+pylint

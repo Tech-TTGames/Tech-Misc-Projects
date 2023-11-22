@@ -1,4 +1,4 @@
-'''Regex '''
+"""Regex discord IDs"""
 from os import system
 
 import re
@@ -9,7 +9,7 @@ if input("Enter 1 to use current clipboard;\n") == '1':
 else:
     print("Ready! Please copy the text to filter.")
     a = pyperclip.waitForNewPaste()
-    l = re.findall(r'[0-9]{18}',a)
+    l = re.findall(r'[0-9]{18}', a)
     chunks = [l[x:x+100] for x in range(0, len(l), 100)]
     if len(chunks) == 1:
         result = ' '.join([str(elem) for elem in chunks[0]])

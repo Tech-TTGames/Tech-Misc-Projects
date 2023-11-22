@@ -13,13 +13,13 @@ import colorama
 
 import pyperclip
 
-# COLORCODES
+# COLOR CODES
 colorama.init()
 RED = colorama.Fore.RED
 RESET = colorama.Fore.RESET
 BLUE = colorama.Fore.BLUE
 
-print(RED+ "SCP Foundation ID Generator")
+print(RED + "SCP Foundation ID Generator")
 print("Access strictly prohibited to unauthorized personnel!")
 print(RESET)
 
@@ -27,7 +27,7 @@ data = ["", "", "", "", ""]
 
 # DEPARTMENT CODE (5 chars) - Padded with asterisks
 while True:
-    dept = input("Enter the deparment code (Max 5 chars):\n")
+    dept = input("Enter the department code (Max 5 chars):\n")
     if len(dept) > 5:
         print(RED + "Error: Department code too long!" + RESET)
         continue
