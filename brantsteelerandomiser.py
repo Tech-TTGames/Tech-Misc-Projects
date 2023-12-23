@@ -10,6 +10,7 @@ Typical usage example:
 """
 
 import argparse
+import colorsys
 import random
 from pathlib import Path
 from typing import TextIO
@@ -164,6 +165,13 @@ if __name__ == '__main__':
         print("Randomizing cast...")
         random.shuffle(sim.cast)
     if args.district_colors:
-        for district in sim.districts:
-            district['color'] = "#" + hex(random.randrange(0, 2**24))[2:]
+        print("Assigning district colors...")
+        max_hue = 360
+        increment = max_hue // len(sim.districts)
+        offset = random.randint(0, increment)
+        for i, district in enumerate(sim.districts):
+            rgb = colorsys.hsv_to_rgb((i * increment + offset) / 360, 1.0, 1.0)
+            rgb = tuple([int(x * 255) for x in rgb])
+            color = '#%02x%02x%02x' % (rgb[0], rgb[1], rgb[2])
+            district['color'] = color + " 0 0"
     sim.write(output)
