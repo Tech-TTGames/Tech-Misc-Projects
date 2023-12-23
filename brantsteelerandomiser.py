@@ -139,6 +139,20 @@ if __name__ == '__main__':
         help='Output file.',
         required=False,
     )
+    parser.add_argument(
+        '-c',
+        '--cast',
+        action='store_true',
+        help='Randomize cast.',
+        default=False,
+    )
+    parser.add_argument(
+        '-dc',
+        '--district_colors',
+        action='store_true',
+        help='Randomize district colors.',
+        default=False,
+    )
     args = parser.parse_args()
     intake = Path(args.input)
     if args.output is None:
@@ -146,6 +160,10 @@ if __name__ == '__main__':
     else:
         output = Path(args.output)
     sim = Simulation(intake)
-    print("Randomizing cast...")
-    random.shuffle(sim.cast)
+    if args.cast:
+        print("Randomizing cast...")
+        random.shuffle(sim.cast)
+    if args.district_colors:
+        for district in sim.districts:
+            district['color'] = "#" + hex(random.randrange(0, 2**24))[2:]
     sim.write(output)
