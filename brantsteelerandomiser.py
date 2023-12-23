@@ -12,6 +12,7 @@ Typical usage example:
 import argparse
 import colorsys
 import random
+import colorama
 from pathlib import Path
 from typing import TextIO
 
@@ -155,12 +156,33 @@ if __name__ == '__main__':
         default=False,
     )
     args = parser.parse_args()
+    colorama.init()
     intake = Path(args.input)
     if args.output is None:
         output = Path(args.input[:-4] + '_randomized.txt')
     else:
         output = Path(args.output)
-    sim = Simulation(intake)
+    if not intake.exists():
+        print(colorama.Fore.RED + "Input file does not exist!" +
+              colorama.Style.RESET_ALL)
+        print("Exiting...")
+        exit(1)
+    if output.exists():
+        print(colorama.Fore.RED + "Output file already exists!")
+        print("Are you sure you want to overwrite it? (Y/N)" +
+              colorama.Style.RESET_ALL)
+        if input().upper() != 'Y':
+            print("Exiting...")
+            exit(0)
+    print("Reading input...")
+    try:
+        sim = Simulation(intake)
+    except Exception as e:
+        print(colorama.Fore.RED + "Error reading input file!" +
+              colorama.Style.RESET_ALL)
+        print(e)
+        print("Exiting...")
+        exit(1)
     if args.cast:
         print("Randomizing cast...")
         random.shuffle(sim.cast)
@@ -175,3 +197,4 @@ if __name__ == '__main__':
             color = '#%02x%02x%02x' % (rgb[0], rgb[1], rgb[2])
             district['color'] = color + " 0 0"
     sim.write(output)
+    print(colorama.Fore.CYAN + "Done! Results written to " + str(output) + ".")
