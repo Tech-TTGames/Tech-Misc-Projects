@@ -16,7 +16,7 @@ yapf = "^0.40.2"
 pylint = "^3.0.3"
 beautifulsoup4 = "^4.12.3"
 selenium = "^4.21.0"
-lxml = "^5.2.2"
+lxml = ">=5.2.2,<7.0.0"
 
 [tool.yapf]
 based_on_style = "google"
