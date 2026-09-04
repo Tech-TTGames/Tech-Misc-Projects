@@ -1,27 +1,37 @@
-[tool.poetry]
+[project]
 name = "TechMisc"
 version = "0"
 description = "Tech's miscellaneous stuff"
+authors = [{ name = "Tech. TTGames", email = "50541739+Tech-TTGames@users.noreply.github.com" }]
+requires-python = ">=3.12,<4"
 license = "EPL-2.0"
-authors = ["Tech. TTGames <50541739+Tech-TTGames@users.noreply.github.com>"]
-repository = "https://github.com/Tech-TTGames/Tech-Misc-Projects"
-package-mode = false
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "pycryptodome~=3.23.0",
+    "pyperclip~=1.11.0",
+    "colorama>=0.4.6,<0.5",
+    "yapf",
+    "pylint",
+    "beautifulsoup4~=4.15.0",
+    "selenium~=4.48.0",
+    "lxml~=6.1.3",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-pycryptodome = "^3.19.1"
-pyperclip = "^1.8.2"
-colorama = "^0.4.6"
-yapf = "^0.40.2"
-pylint = "^3.0.3"
-beautifulsoup4 = "^4.12.3"
-selenium = "^4.21.0"
-lxml = "^5.2.2"
+[project.urls]
+Repository = "https://github.com/Tech-TTGames/Tech-Misc-Projects"
+
+[tool.uv]
+package = false
+
+[build-system]
+requires = ["uv_build>=0.11.26,<0.12.0"]
+build-backend = "uv_build"
 
 [tool.yapf]
 based_on_style = "google"
 column_limit = 120
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
