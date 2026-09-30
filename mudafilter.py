@@ -6,23 +6,21 @@ import pyperclip
 # ==========================================
 
 NOTE_WEIGHT_MAP = {
-    "🤷 🎫": 0.1,
-    "GFL1 🎫": 0.2,
-    "📔": 0.7,
-    "▶️": 1.0,
-    "🔼": 4.0,
-    "⏫": 9.0,
-    "❤️": 18.0,
-    "💖": 35.0,
-    "⭐": 60.0
+    "🤷 🎫": 0.5,  # I don't really care
+    "???": 0.6,  # ????
+    "📷": 0.75,  # I don't know you, but you look interesting
+    "📔": 1.0,  # I know you
+    "🔖": 1.5,  # I know you and like you a bit
+    "▶️": 3.0,  # Like them
+    "🔼": 5.0,  # Like them a bunch
+    "⏫": 10.0,  # Like them very much
+    "❤️": 20.0,  # Love them
+    "💖": 40.0,  # Love them a bunch
+    "⭐": 60.0  # Best of all Time
 }
 
 
 def combine_lists(list1, list2):
-    """
-    Intelligently merges two character lists, grouping characters
-    from both lists under their shared series headers.
-    """
     series_dict = {}
 
     for text in [list1, list2]:
@@ -79,16 +77,12 @@ def get_filtered_series_weighted(
         min_density=0.0,
         persist=False
 ):
-    """
-    Parses character list text and evaluates series using composite score density:
-    - total_weight: sum of (rank_score * note_multiplier) for all valid characters
-    - density: total_weight / total_series_chars
-    """
     if disabled_toggles is None:
         disabled_toggles = []
 
     lines = text_data.split('\n')
     qualifying_series = []
+    rejected_series = []
     persisted_output = []
 
     current_series = None
@@ -96,7 +90,6 @@ def get_filtered_series_weighted(
 
     total_series_chars = 0
     series_weight_sum = 0.0
-    valid_chars_counted = 0
 
     def evaluate_current():
         if current_series is None or total_series_chars == 0:
@@ -109,6 +102,8 @@ def get_filtered_series_weighted(
             qualifying_series.append((current_series, series_weight_sum, density))
             persisted_output.extend(current_series_lines)
             persisted_output.append("")
+        else:
+            rejected_series.append((current_series, series_weight_sum, density))
 
     for line in lines:
         stripped_line = line.strip()
@@ -127,7 +122,6 @@ def get_filtered_series_weighted(
             total_series_chars = int(header_match.group(3))
             current_series_lines = [line]
             series_weight_sum = 0.0
-            valid_chars_counted = 0
 
             if not current_series:
                 current_series = "<Unknown Series>"
@@ -155,15 +149,14 @@ def get_filtered_series_weighted(
             # Calculate continuous weight
             w = calculate_character_weight(rank, best_note_str)
             series_weight_sum += w
-            valid_chars_counted += 1
 
     # Evaluate final block
     evaluate_current()
 
     if persist:
-        return '\n'.join(persisted_output).strip()
+        return '\n'.join(persisted_output).strip(), []
 
-    return qualifying_series
+    return qualifying_series, rejected_series
 
 
 # ==========================================
@@ -176,9 +169,10 @@ if __name__ == "__main__":
 
     print("=== Data Input ===")
 
-    text_input = ""
-    #file_2_name = input("Enter the filename for second list to combine or just click enter if none: ").strip()
+    # Optional dual-file reading
     file_2_name = "topli.txt"
+    # file_2_name = input("Enter the filename for second list to combine or just click enter if none: ").strip()
+
     try:
         if file_2_name:
             with open(FILE_PATH_1, 'r', encoding='utf-8') as file1:
@@ -209,7 +203,7 @@ if __name__ == "__main__":
         use_persist_mode = persist_input == 'y'
 
         # Run the function
-        result_output = get_filtered_series_weighted(
+        result_output, rejected_series = get_filtered_series_weighted(
             text_input,
             disabled_toggles=DISABLED_TOGGLES,
             min_density=min_density,
@@ -219,7 +213,6 @@ if __name__ == "__main__":
         # Output Results
         if use_persist_mode:
             if result_output:
-                assert isinstance(result_output, str)
                 pyperclip.copy(result_output)
                 print(f"\nSuccessfully copied {len(result_output.splitlines())} lines of persisted text to clipboard!")
             else:
@@ -236,9 +229,34 @@ if __name__ == "__main__":
                 for s_name, s_weight, s_dens in sorted_results[:10]:
                     print(f" - {s_name}: Density {s_dens:.2f} (Total Score: {s_weight:.2f})")
 
-                print("\nSuccessfully copied series names to clipboard!")
+                print("\nSuccessfully copied main series names to clipboard!")
             else:
                 print("\nNo series matched the criteria. Clipboard was not updated.")
+
+            # --- HEAVY REJECTS RESCUE ---
+            if rejected_series:
+                print("\n" + "=" * 30)
+                rescue_input = input(
+                    "Check for 'Heavy' rejected series? (Enter minimum Total Score, e.g., 15, or press Enter to skip): ").strip()
+                if rescue_input:
+                    try:
+                        min_heavy = float(rescue_input)
+                        heavy_rescues = [s for s in rejected_series if s[1] >= min_heavy]
+
+                        if heavy_rescues:
+                            heavy_names = [s[0] for s in heavy_rescues]
+                            pyperclip.copy("$".join(heavy_names))
+                            print(
+                                f"\nFound {len(heavy_rescues)} heavy rejected series. OVERWROTE clipboard with this new list!")
+
+                            print("\nTop Heavy Series Rescued:")
+                            heavy_rescues_sorted = sorted(heavy_rescues, key=lambda x: x[1], reverse=True)
+                            for s_name, s_weight, s_dens in heavy_rescues_sorted:
+                                print(f" - {s_name}: Total Score {s_weight:.2f} (Density: {s_dens:.2f})")
+                        else:
+                            print("\nNo rejected series met that weight threshold.")
+                    except ValueError:
+                        print("\nSkipping heavy rescue.")
 
     except FileNotFoundError as e:
         print(f"Error: Could not find the file. {e}")
